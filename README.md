@@ -39,9 +39,10 @@ Reconstruction error doubles as an **anomaly signal**: inputs the autoencoder ca
 ## Repository structure
 
 ```
-├── notebooks/          # training & evaluation notebook (Google Colab)
-├── model/              # saved Keras/TensorFlow weights (.h5)
-├── app/                # Flask web app for inference (deployed on Railway)
+├── notebooks/
+│   └── penelitian_ilmiah_autoencoder_cnn.ipynb  # full training + evaluation pipeline
+├── model/              # saved Keras/TensorFlow weights (.h5) — to be added
+├── app/                # Flask web app for inference (deployed on Railway) — to be added
 ├── requirements.txt
 └── README.md
 ```
