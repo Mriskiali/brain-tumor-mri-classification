@@ -1,5 +1,11 @@
 # Brain Tumor MRI Classification — Hybrid Autoencoder + CNN
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://brain-tumor-mri-classification-web.streamlit.app)
+[![Notebook](https://img.shields.io/badge/Notebook-Kaggle-20BEFF?logo=kaggle&logoColor=white)](https://www.kaggle.com/code/riskiali/skripsi-brain-tumor-mri-classification)
+[![Web App Code](https://img.shields.io/badge/Web_App-Source-181717?logo=github)](https://github.com/Mriskiali/brain-tumor-mri-classification-web)
+
+> **Try it live:** upload an MRI scan and get a prediction with per-class probabilities and a model attention heatmap -> [brain-tumor-mri-classification-web.streamlit.app](https://brain-tumor-mri-classification-web.streamlit.app) (research/educational tool, not a medical device).
+
 Deep learning system that classifies brain tumors from MRI scans into 4 classes — **glioma**, **meningioma**, **pituitary**, and **no tumor** — using a hybrid **Autoencoder + CNN** architecture, with an autoencoder reconstruction-error branch for anomaly detection.
 
 ## Research Evolution
@@ -50,7 +56,9 @@ Internal test-set classification report (thesis version, harder multi-dataset mi
 │   ├── penelitian_ilmiah_autoencoder_cnn.ipynb     # research paper: baseline AE+CNN (95% acc)
 │   └── skripsi_hybrid_autoencoder_cnn_clahe.ipynb  # thesis: hybrid + CLAHE + external validation
 ├── model/          # saved Keras/TensorFlow weights (.h5) — to be added
-├── app/            # Flask web app for inference (deployed on Railway) — to be added
+├── app/            # Flask web app for inference (Railway)
+
+**Web demo (Streamlit):** [brain-tumor-mri-classification-web](https://github.com/Mriskiali/brain-tumor-mri-classification-web) — live at [brain-tumor-mri-classification-web.streamlit.app](https://brain-tumor-mri-classification-web.streamlit.app), includes Grad-CAM-style attention heatmap and per-class probabilities.
 ├── requirements.txt
 └── README.md
 ```
