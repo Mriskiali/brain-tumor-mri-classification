@@ -3,6 +3,7 @@ import html
 import io
 import os
 import re
+import zipfile
 from datetime import datetime, timedelta, timezone
 
 os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
@@ -394,6 +395,32 @@ def build_pdf(name, stamp, size_txt, probs, top, orig_png, proc_png, cam_png) ->
 # ----------------------------------------------------------------------------
 # Pembantu tampilan
 # ----------------------------------------------------------------------------
+def model_file_problem():
+    """Periksa file model dan kembalikan pesan masalahnya (atau None kalau tampak valid).
+
+    Keras melaporkan "File not found" untuk file .keras yang bukan zip, padahal file-nya ada.
+    Pengecekan ini membedakan penyebab yang sebenarnya.
+    """
+    if not os.path.exists(MODEL_PATH):
+        return "File `classifier_final.keras` tidak ditemukan di folder yang sama dengan `app.py`."
+    if os.path.isdir(MODEL_PATH):
+        return ("`classifier_final.keras` berupa folder, padahal harus satu file. "
+                "Jangan extract file .keras, upload file aslinya.")
+    size = os.path.getsize(MODEL_PATH)
+    with open(MODEL_PATH, "rb") as f:
+        head = f.read(64)
+    if head.startswith(b"version https://git-lfs"):
+        return (f"`classifier_final.keras` hanya berisi pointer Git LFS ({size} byte), bukan model aslinya. "
+                "Push ulang model tanpa Git LFS.")
+    if head.startswith(b"\x89HDF"):
+        return ("`classifier_final.keras` sebenarnya berformat HDF5 (.h5) yang hanya diganti namanya. "
+                "Ambil file `classifier_final.keras` yang asli dari output notebook.")
+    if not zipfile.is_zipfile(MODEL_PATH):
+        return (f"`classifier_final.keras` ({size:,} byte) bukan arsip .keras yang valid. "
+                "File kemungkinan rusak atau terpotong saat upload.")
+    return None
+
+
 def pct(p: float) -> str:
     return f"{p * 100:.1f}".replace(".", ",") + "%"
 
@@ -420,8 +447,9 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-if not os.path.exists(MODEL_PATH):
-    st.error("File `classifier_final.keras` tidak ditemukan di folder yang sama dengan `app.py`.")
+problem = model_file_problem()
+if problem:
+    st.error(problem)
     st.stop()
 
 uploaded = st.file_uploader("Pilih citra MRI (JPG, JPEG, atau PNG)", type=["jpg", "jpeg", "png"])
