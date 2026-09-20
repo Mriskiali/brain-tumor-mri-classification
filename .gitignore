@@ -1,0 +1,25 @@
+# --- repo brain-tumor-mri-classification ---
+# model weights (upload terpisah / via release karena besar)
+model/*.h5
+*.h5
+*.keras
+*.pkl
+
+# data
+data/
+*.zip
+*.rar
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+.env
+
+# os / ide
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
