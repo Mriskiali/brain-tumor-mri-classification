@@ -4,3 +4,4 @@ keras==3.13.2
 opencv-python-headless
 numpy
 pillow
+reportlab
