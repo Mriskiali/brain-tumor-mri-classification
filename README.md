@@ -2,63 +2,73 @@
 
 Deep learning system that classifies brain tumors from MRI scans into 4 classes — **glioma**, **meningioma**, **pituitary**, and **no tumor** — using a hybrid **Autoencoder + CNN** architecture, with an autoencoder reconstruction-error branch for anomaly detection.
 
-**Test accuracy: 95%** (precision / recall / F1 = 0.95 across all classes) on a held-out set of 1,143 images from a public dataset of 7,022 MRI scans.
+## Research Evolution
 
-> Undergraduate thesis project: *"Brain Tumor Classification on MRI Images Using a Hybrid Autoencoder and CNN Architecture with CLAHE Preprocessing Optimization"* — Informatics, Universitas Gunadarma (2026).
+This repository covers two stages of the same research line (Informatics, Universitas Gunadarma):
 
-## Results
+1. **Research Paper (Tulisan Ilmiah, 2025)** — `notebooks/penelitian_ilmiah_autoencoder_cnn.ipynb`
+   Baseline pipeline: Autoencoder + CNN, grayscale/resize/normalization preprocessing. **95% test accuracy** (precision/recall/F1 = 0.95, 1,143 test images, MSE 0.00135, SSIM 0.93). Deployed as a Flask web app on Railway.
 
-### Classification report (test set, 1,143 images)
+2. **Undergraduate Thesis (Skripsi, 2026)** — `notebooks/skripsi_hybrid_autoencoder_cnn_clahe.ipynb`
+   Full upgrade: **CLAHE preprocessing optimization** (with ablation study), a 3-stage training pipeline (Autoencoder pretraining -> frozen-encoder classifier -> fine-tuning), full determinism controls, and **external validation on BraTS 2020**. Also explores Grad-CAM explainability and an end-to-end data audit (corrupt/duplicate/watermark detection).
 
-| Class       | Precision | Recall | F1-score | Support |
-|-------------|-----------|--------|----------|---------|
-| glioma      | 0.96      | 0.94   | 0.95     | 288     |
-| meningioma  | 0.91      | 0.89   | 0.90     | 265     |
-| notumor     | 0.97      | 0.96   | 0.97     | 291     |
-| pituitary   | 0.95      | 0.99   | 0.97     | 299     |
-| **accuracy / macro / weighted** | | | **0.95** | 1143 |
+## Thesis Results (Kaggle, GPU T4 x2, 1h 30m)
 
-### Autoencoder reconstruction quality
+| Metric | Value | Target |
+|---|---|---|
+| SSIM (Autoencoder) | 0.8872 | > 0.85 |
+| MSE (Autoencoder) | 0.003422 | < 0.01 |
+| Test Accuracy (internal) | 82.14% (711 samples) | |
+| External Accuracy (BraTS 2020, glioma) | 82.92% (240 samples) | |
 
-| Metric | Value |
-|--------|-------|
-| MSE  | 0.00135 |
-| SSIM | 0.93 |
+Internal test-set classification report (thesis version, harder multi-dataset mix):
 
-Reconstruction error doubles as an **anomaly signal**: inputs the autoencoder cannot reconstruct well are flagged for review before the CNN classification is shown.
+| Class | Precision | Recall | F1 | Support |
+|---|---|---|---|---|
+| glioma | 0.93 | 0.78 | 0.85 | 252 |
+| meningioma | 0.80 | 0.65 | 0.71 | 176 |
+| notumor | 0.68 | 0.91 | 0.78 | 69 |
+| pituitary | 0.80 | 0.99 | 0.88 | 214 |
 
-## Pipeline
+> The research-paper version (single clean dataset, simpler split) reached **95% accuracy** — see the first notebook. The thesis version is evaluated on a much harder, multi-source dataset mix (7,200 + 10,560 images + BraTS NIfTI volumes) with external validation, which is why absolute numbers differ.
 
-1. **Dataset** — public Brain Tumor MRI Dataset (7,022 images). Split: 60% train / 20% validation / 20% test.
-2. **Preprocessing** — CLAHE contrast enhancement, grayscale conversion, resize to 128×128, pixel normalization to [0, 1].
-3. **Architecture** — convolutional Autoencoder for representation learning and reconstruction-error anomaly detection, followed by a CNN classifier for 4-class softmax output.
-4. **Training** — Google Colab (NVIDIA T4), up to 100 epochs, validation-tracked (val accuracy peaked at ~0.95 early in training).
-5. **Evaluation** — confusion matrix + per-class precision/recall/F1 on the untouched test set.
-6. **Deployment** — the trained model is served as a **Flask** web app on **Railway**: upload an MRI image, get real-time classification plus an anomaly indication from reconstruction error.
+## Pipeline (Thesis Version)
 
-## Repository structure
+1. **Data** — 3 Kaggle datasets (Brain Tumor MRI, ishans24 Brain Tumor, BraTS 2020 NIfTI) via kagglehub
+2. **Cleaning & audit** — corrupt/0-byte scan, duplicate detection, watermark removal, outlier analysis
+3. **Preprocessing** — CLAHE optimization (ablation over clip/tile parameters), grayscale, resize 128x128, normalization
+4. **Stage 1** — Autoencoder training (50 epochs, reconstruction + anomaly signal)
+5. **Stage 2** — Classifier training on frozen encoder (30 epochs)
+6. **Stage 3** — Fine-tuning (20 epochs, lr 1e-5)
+7. **Evaluation** — confusion matrix, per-class precision/recall/F1, ROC/AUC, Grad-CAM
+8. **External validation** — BraTS 2020 glioma subset
+
+## Repository Structure
 
 ```
 ├── notebooks/
-│   └── penelitian_ilmiah_autoencoder_cnn.ipynb  # full training + evaluation pipeline
-├── model/              # saved Keras/TensorFlow weights (.h5) — to be added
-├── app/                # Flask web app for inference (deployed on Railway) — to be added
+│   ├── penelitian_ilmiah_autoencoder_cnn.ipynb     # research paper: baseline AE+CNN (95% acc)
+│   └── skripsi_hybrid_autoencoder_cnn_clahe.ipynb  # thesis: hybrid + CLAHE + external validation
+├── model/          # saved Keras/TensorFlow weights (.h5) — to be added
+├── app/            # Flask web app for inference (deployed on Railway) — to be added
 ├── requirements.txt
 └── README.md
 ```
 
-## Getting started
+## Getting Started
+
+Open the notebooks in Google Colab or Kaggle (GPU recommended):
 
 ```bash
 git clone https://github.com/Mriskiali/brain-tumor-mri-classification.git
 cd brain-tumor-mri-classification
 pip install -r requirements.txt
-python app/app.py   # run the inference web app locally
+jupyter notebook notebooks/
 ```
 
-## Tech stack
+## Tech Stack
 
-Python · TensorFlow/Keras · OpenCV (CLAHE) · Flask · Railway · Google Colab (T4 GPU)
+Python · TensorFlow/Keras · OpenCV (CLAHE) · scikit-learn · Flask · Railway · Kaggle (T4 GPU) · nibabel (NIfTI)
 
 ## Author
 
