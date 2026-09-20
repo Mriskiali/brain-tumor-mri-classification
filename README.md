@@ -55,8 +55,9 @@ Internal test-set classification report (thesis version, harder multi-dataset mi
 ├── notebooks/
 │   ├── penelitian_ilmiah_autoencoder_cnn.ipynb     # research paper: baseline AE+CNN (95% acc)
 │   └── skripsi_hybrid_autoencoder_cnn_clahe.ipynb  # thesis: hybrid + CLAHE + external validation
-├── model/          # saved Keras/TensorFlow weights (.h5) — to be added
-├── webapp/         # Streamlit live demo (also deployed at brain-tumor-mri-classification-web.streamlit.app)
+├── webapp/
+│   ├── app.py                  # Streamlit demo (live: brain-tumor-mri-classification-web.streamlit.app)
+│   └── classifier_final.keras  # trained model weights (38 MB)
 
 **Web demo (Streamlit):** [webapp/](https://github.com/Mriskiali/brain-tumor-mri-classification/tree/main/webapp) — live at [brain-tumor-mri-classification-web.streamlit.app](https://brain-tumor-mri-classification-web.streamlit.app). Run locally with `streamlit run webapp/app.py`. Includes Grad-CAM-style attention heatmap and per-class probabilities.
 ├── requirements.txt
